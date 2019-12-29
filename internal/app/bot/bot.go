@@ -1,41 +1,23 @@
 package bot
 
 import (
-	"github.com/aggyomfg/creampie-bot/internal/app/skills"
+	"github.com/aggyomfg/creampie-bot/internal/app/store/memorystore"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/sirupsen/logrus"
-)
-
-var (
-	log       *logrus.Logger
-	botSkills = skills.Skills{}
+	"os"
 )
 
 // Start runs bot instance
 func Start(config *Config) {
+	logger := config.Logger
+	tgbotapi.SetLogger(logger)
 
-	log = config.Logger
-	tgbotapi.SetLogger(log)
-
+	store := memorystore.New()
 	bot, err := tgbotapi.NewBotAPI(config.TelegramToken)
+	// bot.Debug = true
 	if err != nil {
-		log.Panic(err)
+		logger.Error(err)
+		os.Exit(1)
 	}
-
-	bot.Debug = true
-
-	log.Printf("Authorized on account %s", bot.Self.UserName)
-
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates, err := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		if update.Message == nil { // ignore any non-Message Updates
-			continue
-		}
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-		handleMsg(bot, update.Message)
-	}
+	srv := newServer(store, *bot, logger)
+	srv.Run()
 }

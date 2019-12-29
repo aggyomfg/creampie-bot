@@ -5,7 +5,8 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func handeCommand(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
+func handeCommand(server *server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
+	onlyAdminString := "Только админ может менять режим"
 	sendMsg := tgbotapi.NewMessage(msg.Chat.ID, "")
 	switch msg.Command() {
 	case "help":
@@ -14,10 +15,12 @@ func handeCommand(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 		sendMsg.Text = "Hi :)"
 	case "status":
 		sendMsg.Text = "I'm ok."
+	case "duel":
+		skills.Duel(bot, msg, server.store)
 	case "dice":
 		skills.RollDice(bot, msg)
 	case "sticker_mode_on":
-		if adminCheck(bot, msg) {
+		if adminCheck(server, bot, msg) {
 			botSkills.RegisterSkill(
 				skills.Skill{
 					Name:     "StickerMode",
@@ -27,10 +30,10 @@ func handeCommand(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 			sendMsg.Text = "Общаемся только стикерами и гифками :P"
 			break
 		}
-		sendMsg.Text = "Только админ может менять режим"
+		sendMsg.Text = onlyAdminString
 
 	case "sticker_mode_off":
-		if adminCheck(bot, msg) {
+		if adminCheck(server, bot, msg) {
 			botSkills.UnregisterSkill(
 				skills.Skill{
 					Name: "StickerMode",
@@ -39,19 +42,19 @@ func handeCommand(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 			sendMsg.Text = "Общаемся нормально!"
 			break
 		}
-		sendMsg.Text = "Только админ может менять режим"
+		sendMsg.Text = onlyAdminString
 	default:
-		sendMsg.Text = "I don't know that command"
+		sendMsg.Text = "Неизвестная команда :("
 	}
 	bot.Send(sendMsg)
 }
 
-func adminCheck(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) bool {
+func adminCheck(server *server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) bool {
 	admins, err := bot.GetChatAdministrators(tgbotapi.ChatConfig{
 		ChatID: msg.Chat.ID,
 	})
 	if err != nil {
-		log.Error(err)
+		server.log.Error(err)
 	}
 	for _, a := range admins {
 		if msg.From.ID == a.User.ID {

@@ -8,6 +8,9 @@ build:
 	go build -v ./cmd/bot
 build-docker:
 	docker build -t bot .
+	docker run --rm -v $(CURDIR):/local bot cp /bin/bot /local/
+deploy:
+	scp $(CURDIR)/bot ubuntu@aggy.ga:/home/ubuntu/creampie-bot/
 test:
 	go test -v -race ./...
 test-docker:
