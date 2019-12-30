@@ -40,6 +40,16 @@ func (r *DuelRepository) Find(id int) (*model.Duel, error) {
 	return d, nil
 }
 
+// Delete ...
+func (r *DuelRepository) Delete(id int) error {
+	d, ok := r.duels[id]
+	if !ok {
+		return store.ErrRecordNotFound
+	}
+	delete(r.duels, d.ID)
+	return nil
+}
+
 // FindByUser ...
 func (r *DuelRepository) FindByUser(user tgbotapi.User) (*model.Duel, error) {
 	for _, d := range r.duels {

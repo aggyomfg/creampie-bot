@@ -17,6 +17,8 @@ func handeCommand(server *server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 		sendMsg.Text = "I'm ok."
 	case "duel":
 		skills.Duel(bot, msg, server.store)
+	case "shot":
+		skills.DuelShot(bot, msg, server.store)
 	case "dice":
 		skills.RollDice(bot, msg)
 	case "sticker_mode_on":

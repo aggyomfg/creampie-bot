@@ -1,0 +1,1 @@
+bash -c "scp ./bot ubuntu@aggy.ga:/home/ubuntu/creampie-bot/"

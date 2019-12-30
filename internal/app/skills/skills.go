@@ -41,3 +41,14 @@ func (skills *Skills) UnregisterSkill(skill Skill) []Skill {
 	}
 	return skills.List
 }
+
+func deleteMessage(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
+	deleteMessageConfig := tgbotapi.DeleteMessageConfig{
+		ChatID:    msg.Chat.ID,
+		MessageID: msg.MessageID,
+	}
+	_, err := bot.DeleteMessage(deleteMessageConfig)
+	if err != nil {
+		log.Error(err)
+	}
+}

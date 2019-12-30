@@ -6,8 +6,9 @@ import (
 
 // Duel ...
 type Duel struct {
-	ID       int
-	Attacker tgbotapi.User
-	Defender tgbotapi.User
-	Active   bool
+	ID            int
+	Attacker      tgbotapi.User
+	Defender      tgbotapi.User
+	BarrelRound   int
+	CurrentPlayer tgbotapi.User
 }

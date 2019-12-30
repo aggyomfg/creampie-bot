@@ -8,15 +8,7 @@ import (
 func StickerMode() func(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 	return func(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 		if !(msg.Sticker != nil || msg.Animation != nil) {
-			deleteMessageConfig := tgbotapi.DeleteMessageConfig{
-				ChatID:    msg.Chat.ID,
-				MessageID: msg.MessageID,
-			}
-			_, err := bot.DeleteMessage(deleteMessageConfig)
-
-			if err != nil {
-				log.Error(err)
-			}
+			deleteMessage(bot, msg)
 		}
 	}
 }
