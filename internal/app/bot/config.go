@@ -10,6 +10,7 @@ import (
 type Config struct {
 	BindAddr      string `env:"BIND_ADDR"`
 	TelegramToken string `env:"TELEGRAM_TOKEN"`
+	Proxy         string `env:"PROXY_URL"`
 	Logger        *logrus.Logger
 }
 

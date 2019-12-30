@@ -20,14 +20,24 @@ func (r *DuelRepository) Create(d *model.Duel) error {
 	return nil
 }
 
+// GetLast ...
+func (r *DuelRepository) GetLast() (*model.Duel, error) {
+	for _, d := range r.duels {
+		if d.ID == len(r.duels) {
+			return d, nil
+		}
+	}
+	return nil, store.ErrRecordNotFound
+}
+
 // Find ...
 func (r *DuelRepository) Find(id int) (*model.Duel, error) {
-	u, ok := r.duels[id]
+	d, ok := r.duels[id]
 	if !ok {
 		return nil, store.ErrRecordNotFound
 	}
 
-	return u, nil
+	return d, nil
 }
 
 // FindByUser ...
@@ -36,7 +46,9 @@ func (r *DuelRepository) FindByUser(user tgbotapi.User) (*model.Duel, error) {
 		if d.Attacker == user {
 			return d, nil
 		}
+		if d.Defender == user {
+			return d, nil
+		}
 	}
-
 	return nil, store.ErrRecordNotFound
 }
