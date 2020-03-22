@@ -5,7 +5,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func handeCommand(server *server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
+func handeCommand(server *Server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 	onlyAdminString := "Только админ может менять режим"
 	sendMsg := tgbotapi.NewMessage(msg.Chat.ID, "")
 	switch msg.Command() {
@@ -45,13 +45,39 @@ func handeCommand(server *server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 			break
 		}
 		sendMsg.Text = onlyAdminString
+	case "translate_mode_on":
+		if adminCheck(server, bot, msg) {
+			botSkills.RegisterSkill(
+				skills.Skill{
+					Name: "TranslateMode",
+					Function: skills.TranslateMode(
+						server.config.YaTranslateAPIKey,
+						server.config.Logger),
+				},
+			)
+			sendMsg.Text = "Побалакаем?"
+			break
+		}
+		sendMsg.Text = onlyAdminString
+
+	case "translate_mode_off":
+		if adminCheck(server, bot, msg) {
+			botSkills.UnregisterSkill(
+				skills.Skill{
+					Name: "TranslateMode",
+				},
+			)
+			sendMsg.Text = "Общаемся нормально!"
+			break
+		}
+		sendMsg.Text = onlyAdminString
 	default:
 		sendMsg.Text = "Неизвестная команда :("
 	}
 	bot.Send(sendMsg)
 }
 
-func adminCheck(server *server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) bool {
+func adminCheck(server *Server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) bool {
 	admins, err := bot.GetChatAdministrators(tgbotapi.ChatConfig{
 		ChatID: msg.Chat.ID,
 	})

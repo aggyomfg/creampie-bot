@@ -4,7 +4,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func handleMsg(server *server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
+func handleMsg(server *Server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 
 	if msg.IsCommand() {
 		handeCommand(server, bot, msg)

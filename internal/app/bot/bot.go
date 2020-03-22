@@ -5,12 +5,13 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/aggyomfg/creampie-bot/internal/app/model"
 	"github.com/aggyomfg/creampie-bot/internal/app/store/memorystore"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 // Start runs bot instance
-func Start(config *Config) {
+func Start(config *model.Config) {
 	logger := config.Logger
 	tgbotapi.SetLogger(logger)
 
@@ -33,6 +34,7 @@ func Start(config *Config) {
 		logger.Error(err)
 		os.Exit(1)
 	}
-	srv := newServer(store, *bot, logger)
+	srv := newServer(store, *bot, config)
+
 	srv.Run()
 }

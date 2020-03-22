@@ -5,7 +5,7 @@ migrate:
 migrate-test:
 	migrate -path migrations -database "postgres://poolcrm:poolcrm@localhost:5433/poolcrm_test?sslmode=disable" up
 build:
-	go build -v ./cmd/bot
+	GOOS=linux GOARCH=amd64 go build -v ./cmd/bot
 build-docker:
 	docker build -t bot .
 	docker run --rm -v $(CURDIR):/local bot cp /bin/bot /local/

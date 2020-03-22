@@ -3,19 +3,12 @@ package bot
 import (
 	"os"
 
+	"github.com/aggyomfg/creampie-bot/internal/app/model"
 	"github.com/sirupsen/logrus"
 )
 
-// Config ...
-type Config struct {
-	BindAddr      string `env:"BIND_ADDR"`
-	TelegramToken string `env:"TELEGRAM_TOKEN"`
-	Proxy         string `env:"PROXY_URL"`
-	Logger        *logrus.Logger
-}
-
 // NewConfig ...
-func NewConfig() *Config {
+func NewConfig() *model.Config {
 	level, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL"))
 	if err != nil {
 		logrus.Fatal("Cant parse LOG_LEVEL")
@@ -28,7 +21,7 @@ func NewConfig() *Config {
 		Level:     level,
 	}
 
-	return &Config{
+	return &model.Config{
 		Logger: log,
 	}
 }
