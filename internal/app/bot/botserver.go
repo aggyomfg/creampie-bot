@@ -45,7 +45,7 @@ func (s *Server) Run() error {
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
 		}
-		s.log.Printf("[%s] %s", update.Message.From.String, update.Message.Text)
+		s.log.Printf("[%s] %s", update.Message.From.String(), update.Message.Text)
 		handleMsg(s, &s.bot, update.Message)
 	}
 	return nil

@@ -11,8 +11,7 @@ func handleMsg(server *Server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 		return
 	}
 	for i, s := range botSkills.List {
-		server.log.Debug(i, s)
+		server.log.Debug(i, s.Name)
 		s.Function(bot, msg)
 	}
-
 }
