@@ -36,15 +36,30 @@ func getCountyFlag(lang language.Tag) string {
 func TranslateMode(apiKey string, log *logrus.Logger) func(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 	return func(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 		deleteMessage(bot, msg)
-		sendMsg := tgbotapi.NewMessage(msg.Chat.ID, "")
-		tr := translate.New(apiKey)
 		lang := chooseRandomLanguage()
-		translation, err := tr.Translate(lang.String(), msg.Text)
-		if err != nil {
-			log.Error(err)
-		} else {
-			sendMsg.Text = getCountyFlag(lang) + " " + msg.From.String() + ": " + translation.Result()
+		if !(msg.Sticker != nil || msg.Animation != nil) {
+			sendMsg := tgbotapi.NewMessage(msg.Chat.ID, "")
+			tr := translate.New(apiKey)
+			translation, err := tr.Translate(lang.String(), msg.Text)
+			if err != nil {
+				log.Error(err)
+			} else {
+				sendMsg.Text = getCountyFlag(lang) + " " + msg.From.String() + ": " + translation.Result()
+			}
+			bot.Send(sendMsg)
 		}
-		bot.Send(sendMsg)
+		if msg.Sticker != nil {
+			sendTextMsg := tgbotapi.NewMessage(msg.Chat.ID, getCountyFlag(language.Albanian)+" "+msg.From.String()+": ")
+			sendStickerMsg := tgbotapi.NewStickerShare(msg.Chat.ID, msg.Sticker.FileID)
+			bot.Send(sendTextMsg)
+			bot.Send(sendStickerMsg)
+		}
+		if msg.Animation != nil {
+			sendTextMsg := tgbotapi.NewMessage(msg.Chat.ID, getCountyFlag(language.Albanian)+" "+msg.From.String()+": ")
+			sendAnimationMsg := tgbotapi.NewAnimationShare(msg.Chat.ID, msg.Animation.FileID)
+			bot.Send(sendTextMsg)
+			bot.Send(sendAnimationMsg)
+		}
+
 	}
 }
