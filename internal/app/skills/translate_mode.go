@@ -11,22 +11,25 @@ import (
 	"golang.org/x/text/language"
 )
 
-func chooseRandomLanguage() language.Tag {
+func chooseRandomLanguage() string {
 	rand.Seed(time.Now().Unix())
-	languages := []language.Tag{
-		language.Ukrainian,
-		language.Polish,
+	languages := []string{
+		language.Ukrainian.String(),
+		language.Bulgarian.String(),
+		"be", // Белорусский
 	}
 	n := rand.Int() % len(languages)
 	return languages[n]
 }
 
-func getCountyFlag(lang language.Tag) string {
+func getCountyFlag(lang string) string {
 	switch lang {
-	case language.Ukrainian:
+	case language.Ukrainian.String():
 		return "🇺🇦"
-	case language.Polish:
-		return "🇵🇱"
+	case language.Bulgarian.String():
+		return "🇧🇬"
+	case "be":
+		return "🇧🇾"
 	default:
 		return "🏳️‍🌈"
 	}
@@ -36,11 +39,12 @@ func getCountyFlag(lang language.Tag) string {
 func TranslateMode(apiKey string, log *logrus.Logger) func(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 	return func(bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 		deleteMessage(bot, msg)
+		defaultMessage := tgbotapi.NewMessage(msg.Chat.ID, getCountyFlag("none")+" "+msg.From.String()+": ")
 		lang := chooseRandomLanguage()
 		if !(msg.Sticker != nil || msg.Animation != nil) {
 			sendMsg := tgbotapi.NewMessage(msg.Chat.ID, "")
 			tr := translate.New(apiKey)
-			translation, err := tr.Translate(lang.String(), msg.Text)
+			translation, err := tr.Translate(lang, msg.Text)
 			if err != nil {
 				log.Error(err)
 			} else {
@@ -49,13 +53,13 @@ func TranslateMode(apiKey string, log *logrus.Logger) func(bot *tgbotapi.BotAPI,
 			bot.Send(sendMsg)
 		}
 		if msg.Sticker != nil {
-			sendTextMsg := tgbotapi.NewMessage(msg.Chat.ID, getCountyFlag(language.Albanian)+" "+msg.From.String()+": ")
+			sendTextMsg := defaultMessage
 			sendStickerMsg := tgbotapi.NewStickerShare(msg.Chat.ID, msg.Sticker.FileID)
 			bot.Send(sendTextMsg)
 			bot.Send(sendStickerMsg)
 		}
 		if msg.Animation != nil {
-			sendTextMsg := tgbotapi.NewMessage(msg.Chat.ID, getCountyFlag(language.Albanian)+" "+msg.From.String()+": ")
+			sendTextMsg := defaultMessage
 			sendAnimationMsg := tgbotapi.NewAnimationShare(msg.Chat.ID, msg.Animation.FileID)
 			bot.Send(sendTextMsg)
 			bot.Send(sendAnimationMsg)

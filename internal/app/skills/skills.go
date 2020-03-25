@@ -20,25 +20,24 @@ type Skill struct {
 	Function func(bot *tgbotapi.BotAPI, msg *tgbotapi.Message)
 }
 
-// RegisterSkill ...
-func (skills *Skills) RegisterSkill(skill Skill) []Skill {
+// GetCurrentSkillsName ...
+func (skills *Skills) GetCurrentSkillsName() []string {
+	var names []string
 	for _, s := range skills.List {
-		if s.Name == skill.Name {
-			return skills.List
-		}
+		names = append(names, s.Name)
 	}
-	skills.List = append(skills.List, skill)
-	return skills.List
+	return names
 }
 
-// UnregisterSkill ...
-func (skills *Skills) UnregisterSkill(skill Skill) []Skill {
+// SwitchSkill switches skill on/off
+func (skills *Skills) SwitchSkill(skill Skill) []Skill {
 	for p, s := range skills.List {
 		if s.Name == skill.Name {
 			skills.List = append(skills.List[:p], skills.List[p+1:]...)
 			return skills.List
 		}
 	}
+	skills.List = append(skills.List, skill)
 	return skills.List
 }
 

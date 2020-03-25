@@ -21,33 +21,22 @@ func handeCommand(server *Server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 		skills.DuelShot(bot, msg, server.store)
 	case "dice":
 		skills.RollDice(bot, msg)
-	case "sticker_mode_on":
+	case "sticker_mode":
 		if adminCheck(server, bot, msg) {
-			botSkills.RegisterSkill(
+			botSkills.SwitchSkill(
 				skills.Skill{
 					Name:     "StickerMode",
 					Function: skills.StickerMode(),
 				},
 			)
-			sendMsg.Text = "Общаемся только стикерами и гифками :P"
+			sendMsg.Text = printCurrentSkills()
 			break
 		}
 		sendMsg.Text = onlyAdminString
 
-	case "sticker_mode_off":
+	case "translate_mode":
 		if adminCheck(server, bot, msg) {
-			botSkills.UnregisterSkill(
-				skills.Skill{
-					Name: "StickerMode",
-				},
-			)
-			sendMsg.Text = "Общаемся нормально!"
-			break
-		}
-		sendMsg.Text = onlyAdminString
-	case "translate_mode_on":
-		if adminCheck(server, bot, msg) {
-			botSkills.RegisterSkill(
+			botSkills.SwitchSkill(
 				skills.Skill{
 					Name: "TranslateMode",
 					Function: skills.TranslateMode(
@@ -55,26 +44,28 @@ func handeCommand(server *Server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 						server.config.Logger),
 				},
 			)
-			sendMsg.Text = "Побалакаем?"
+			sendMsg.Text = printCurrentSkills()
 			break
 		}
 		sendMsg.Text = onlyAdminString
 
-	case "translate_mode_off":
-		if adminCheck(server, bot, msg) {
-			botSkills.UnregisterSkill(
-				skills.Skill{
-					Name: "TranslateMode",
-				},
-			)
-			sendMsg.Text = "Общаемся нормально!"
-			break
-		}
-		sendMsg.Text = onlyAdminString
 	default:
 		sendMsg.Text = "Неизвестная команда :("
 	}
 	bot.Send(sendMsg)
+}
+
+func printCurrentSkills() string {
+	message := "Текущие режимы:\n"
+	names := botSkills.GetCurrentSkillsName()
+	if len(names) > 0 {
+		for _, name := range names {
+			message = message + name + "\n"
+		}
+	} else {
+		message = message + "Стандартный чат"
+	}
+	return message
 }
 
 func adminCheck(server *Server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) bool {
