@@ -1,6 +1,8 @@
 package store
 
 import (
+	"time"
+
 	"github.com/aggyomfg/creampie-bot/internal/app/model"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -22,4 +24,6 @@ type HolidayRepository interface {
 	GetLast() (*model.HolidayToday, error)
 	GetAllHolidaysToday() ([]string, error)
 	SetAllHolidaysToday([]string)
+	UpdateLastCheckTime()
+	GetLastCheckTime() time.Time
 }

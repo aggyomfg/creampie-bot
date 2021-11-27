@@ -1,6 +1,8 @@
 package memorystore
 
 import (
+	"time"
+
 	"github.com/aggyomfg/creampie-bot/internal/app/model"
 	"github.com/aggyomfg/creampie-bot/internal/app/store"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -11,6 +13,7 @@ type HolidayRepository struct {
 	store            *Store
 	holidays         map[int]*model.HolidayToday
 	todayHolidayList []string
+	lastCheckTime    time.Time
 }
 
 // Create ...
@@ -72,4 +75,14 @@ func (r *HolidayRepository) GetAllHolidaysToday() ([]string, error) {
 // SetAllHolidaysToday
 func (r *HolidayRepository) SetAllHolidaysToday(holidaysToday []string) {
 	r.todayHolidayList = holidaysToday
+}
+
+// UpdateLastCheckTime
+func (r *HolidayRepository) UpdateLastCheckTime() {
+	r.lastCheckTime = time.Now()
+}
+
+// GetLastCheckTime
+func (r *HolidayRepository) GetLastCheckTime() time.Time {
+	return r.lastCheckTime
 }

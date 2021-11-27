@@ -41,26 +41,35 @@ func GetHoliday(bot *tgbotapi.BotAPI, msg *tgbotapi.Message, store store.Store, 
 	log = logger
 	rand.Seed(time.Now().UnixNano())
 	user := *msg.From
+	userName := user.UserName
+	if user.UserName == "" {
+		userName = fmt.Sprintf("%s %s", user.FirstName, user.LastName)
+	}
 	todayHolidays, err := store.HolidayToday().GetAllHolidaysToday()
 	if err != nil {
 		log.Debugf("%s: No holidays in store, getting it now...", err)
+	}
+	if store.HolidayToday().GetLastCheckTime().Day() != time.Now().Day() {
+		log.Debug("Outdated :( lets get new holidays!")
+		todayHolidays = nil
 	}
 	if len(todayHolidays) == 0 {
 		getHolidaysFromAPI()
 		store.HolidayToday().SetAllHolidaysToday(holidayResult)
 		todayHolidays, _ = store.HolidayToday().GetAllHolidaysToday()
+		store.HolidayToday().UpdateLastCheckTime()
 	}
 	mainHoliday := todayHolidays[0]
 	userHoliday, err := store.HolidayToday().FindByUser(user)
 	if err != nil {
-		log.Debugf("%s: Holiday for user %s not found! Creating now...", err, user.UserName)
+		log.Debugf("%s: Holiday for user %s not found! Creating now...", err, userName)
 		store.HolidayToday().Create(&model.HolidayToday{
 			User:    user,
 			Holiday: todayHolidays[rand.Intn(len(todayHolidays))],
 		})
 		userHoliday, _ = store.HolidayToday().FindByUser(user)
 	}
-	message := fmt.Sprintf("🥳🥳🥳\nГлавный праздник на сегодня: 🎉 %s 🎉\n⚡️Но %s сегодня будет отмечать:\n🎉 %s 🎉\n🥳🥳🥳", mainHoliday, user.UserName, userHoliday)
+	message := fmt.Sprintf("🥳🥳🥳\nГлавный праздник на сегодня: 🎉 %s 🎉\n⚡️Но %s сегодня будет отмечать:\n🎉 %s 🎉\n🥳🥳🥳", mainHoliday, userName, userHoliday)
 	sendMsg := tgbotapi.NewMessage(msg.Chat.ID, message)
 	bot.Send(sendMsg)
 }
