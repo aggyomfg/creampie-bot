@@ -21,13 +21,12 @@ type Server struct {
 }
 
 func newServer(store store.Store, bot tgbotapi.BotAPI, config *model.Config) *Server {
-	s := &Server{
+	return &Server{
 		store:  store,
 		bot:    bot,
 		config: config,
 		log:    config.Logger,
 	}
-	return s
 }
 
 // Run ...
