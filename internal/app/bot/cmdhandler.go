@@ -22,7 +22,7 @@ func handeCommand(server *Server, bot *tgbotapi.BotAPI, msg *tgbotapi.Message) {
 	case "dice":
 		skills.RollDice(bot, msg)
 	case "holiday":
-		skills.GetHoliday(bot, msg)
+		skills.GetHoliday(bot, msg, server.store, server.config.Logger)
 	case "sticker_mode":
 		if adminCheck(server, bot, msg) {
 			botSkills.SwitchSkill(

@@ -13,3 +13,13 @@ type DuelRepository interface {
 	FindByUser(tgbotapi.User) (*model.Duel, error)
 	GetLast() (*model.Duel, error)
 }
+
+type HolidayRepository interface {
+	Create(*model.HolidayToday) error
+	Find(int) (*model.HolidayToday, error)
+	Delete(int) error
+	FindByUser(tgbotapi.User) (string, error)
+	GetLast() (*model.HolidayToday, error)
+	GetAllHolidaysToday() ([]string, error)
+	SetAllHolidaysToday([]string)
+}

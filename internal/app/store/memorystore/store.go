@@ -7,7 +7,8 @@ import (
 
 // Store ...
 type Store struct {
-	duelRepository *DuelRepository
+	duelRepository    *DuelRepository
+	holidayRepository *HolidayRepository
 }
 
 // New ...
@@ -27,4 +28,18 @@ func (s *Store) Duel() store.DuelRepository {
 	}
 
 	return s.duelRepository
+}
+
+// HolidayToday ...
+func (s *Store) HolidayToday() store.HolidayRepository {
+	if s.holidayRepository != nil {
+		return s.holidayRepository
+	}
+
+	s.holidayRepository = &HolidayRepository{
+		store:    s,
+		holidays: make(map[int]*model.HolidayToday),
+	}
+
+	return s.holidayRepository
 }
