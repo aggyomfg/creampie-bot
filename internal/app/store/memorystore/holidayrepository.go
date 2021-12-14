@@ -54,6 +54,13 @@ func (r *HolidayRepository) Delete(id int) error {
 	return nil
 }
 
+// deleteAll ...
+func (r *HolidayRepository) deleteAll() {
+	for _, h := range r.holidays {
+		delete(r.holidays, h.ID)
+	}
+}
+
 // FindByUser ...
 func (r *HolidayRepository) FindByUser(user tgbotapi.User) (string, error) {
 	for _, h := range r.holidays {
@@ -74,11 +81,8 @@ func (r *HolidayRepository) GetAllHolidaysToday() ([]string, error) {
 
 // SetAllHolidaysToday
 func (r *HolidayRepository) SetAllHolidaysToday(holidaysToday []string) {
+	r.deleteAll()
 	r.todayHolidayList = holidaysToday
-}
-
-// UpdateLastCheckTime
-func (r *HolidayRepository) UpdateLastCheckTime() {
 	r.lastCheckTime = time.Now()
 }
 

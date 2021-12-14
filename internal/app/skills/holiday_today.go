@@ -54,11 +54,11 @@ func GetHoliday(bot *tgbotapi.BotAPI, msg *tgbotapi.Message, store store.Store, 
 		todayHolidays = nil
 	}
 	if len(todayHolidays) == 0 {
+		log.Debug("Getting new holidays from API...")
 		getHolidaysFromAPI()
 		store.HolidayToday().SetAllHolidaysToday(holidayResult)
-		todayHolidays, _ = store.HolidayToday().GetAllHolidaysToday()
-		store.HolidayToday().UpdateLastCheckTime()
 	}
+	todayHolidays, _ = store.HolidayToday().GetAllHolidaysToday()
 	mainHoliday := todayHolidays[0]
 	userHoliday, err := store.HolidayToday().FindByUser(user)
 	if err != nil {
@@ -86,6 +86,7 @@ func getHolidaysFromAPI() {
 }
 
 func parseHolidayResult(g *geziyor.Geziyor, r *client.Response) {
+	holidayResult = nil
 	findJSPath := "body > div.wrap > div:nth-child(2) > div > div"
 	r.HTMLDoc.Find(findJSPath).Each(func(i int, s *goquery.Selection) {
 		holidaysList := s.Find("div > span")

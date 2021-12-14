@@ -24,6 +24,5 @@ type HolidayRepository interface {
 	GetLast() (*model.HolidayToday, error)
 	GetAllHolidaysToday() ([]string, error)
 	SetAllHolidaysToday([]string)
-	UpdateLastCheckTime()
 	GetLastCheckTime() time.Time
 }
