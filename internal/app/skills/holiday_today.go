@@ -59,6 +59,10 @@ func GetHoliday(bot *tgbotapi.BotAPI, msg *tgbotapi.Message, store store.Store, 
 		store.HolidayToday().SetAllHolidaysToday(holidayResult)
 	}
 	todayHolidays, _ = store.HolidayToday().GetAllHolidaysToday()
+	if len(todayHolidays) == 0 {
+		log.Error("No holidays found.")
+		return
+	}
 	mainHoliday := todayHolidays[0]
 	userHoliday, err := store.HolidayToday().FindByUser(user)
 	if err != nil {
@@ -82,16 +86,21 @@ func getHolidaysFromAPI() {
 	geziyor.NewGeziyor(&geziyor.Options{
 		StartURLs: holidayPageUrl,
 		ParseFunc: parseHolidayResult,
+		ProxyFunc: client.RoundRobinProxy("http://82.202.160.205:8118"),
 	}).Start()
 }
 
 func parseHolidayResult(g *geziyor.Geziyor, r *client.Response) {
 	holidayResult = nil
 	findJSPath := "body > div.wrap > div:nth-child(2) > div > div"
-	r.HTMLDoc.Find(findJSPath).Each(func(i int, s *goquery.Selection) {
-		holidaysList := s.Find("div > span")
-		holidaysList.Each(func(i int, s *goquery.Selection) {
-			holidayResult = append(holidayResult, s.Text())
+	if r.StatusCode == 200 {
+		r.HTMLDoc.Find(findJSPath).Each(func(i int, s *goquery.Selection) {
+			holidaysList := s.Find("div > span")
+			holidaysList.Each(func(i int, s *goquery.Selection) {
+				holidayResult = append(holidayResult, s.Text())
+			})
 		})
-	})
+	} else {
+		log.Errorf("Cant get holidays from API: %d", r.StatusCode)
+	}
 }
